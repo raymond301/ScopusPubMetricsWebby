@@ -3,12 +3,11 @@
 
 import wx
 from conf import Static
-
+from webby import *
 
 class Example(wx.Frame):
     def __init__(self, *args, **kw):
         super(Example, self).__init__(*args, **kw)
-
         self.InitUI()
 
     def InitUI(self):
@@ -33,6 +32,7 @@ class Example(wx.Frame):
         cbtn = wx.Button(pnl, label='Add Authors', pos=(640, 10))  # (from Left, from Top)
         cbtn.Bind(wx.EVT_BUTTON, self.ShowEnterAuthorUI)
 
+        getAuthorBasic(55555555555555)
 
         #### Set Window Attributes ####
         self.SetSize((750, 600))  ## (w,h)

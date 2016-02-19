@@ -4,6 +4,11 @@
 import wx
 from conf import Static
 from webby import *
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
+
+allData = []
 
 class Example(wx.Frame):
     def __init__(self, *args, **kw):
@@ -29,10 +34,11 @@ class Example(wx.Frame):
 
         #### Create Panel ####
         pnl = wx.Panel(self)
-        cbtn = wx.Button(pnl, label='Add Authors', pos=(640, 10))  # (from Left, from Top)
-        cbtn.Bind(wx.EVT_BUTTON, self.ShowEnterAuthorUI)
 
-        getAuthorBasic(55555555555555)
+        cbtn = wx.Button(pnl, label='Add Authors', pos=(640, 10))  # (from Left, from Top)
+        cbtn.Bind(wx.EVT_BUTTON, self.on_button)
+        # self.button.Bind(wx.EVT_BUTTON, self.on_button)
+
 
         #### Set Window Attributes ####
         self.SetSize((750, 600))  ## (w,h)
@@ -42,28 +48,24 @@ class Example(wx.Frame):
     def OnQuit(self, e):
         self.Close()
 
-    def onOK(self, e):
-        self.Close()
+    def on_button(self, evt):
+        frame = AddAuthorsFrame(self)
+        frame.Show(True)
+        frame.MakeModal(True)
 
-    def onCancel(self, e):
-        self.Close()
 
-    def ShowEnterAuthorUI(self, e):
-        f2 = wx.Frame(None, -1)
-        f2.Centre()
+class AddAuthorsFrame(wx.Frame):
+    def __init__(self, parent):
+        wx.Frame.__init__(self, parent, wx.NewId(), "Add Scopus Author")
+        # self.Bind(wx.EVT_CLOSE, self.on_close)
+        self.Centre()
         # Add a panel so it looks correct on all platforms
-        p2 = wx.Panel(f2, wx.ID_ANY)
+        p2 = wx.Panel(self, wx.ID_ANY)
 
         labelOne = wx.StaticText(p2, wx.ID_ANY, 'Select Workunit:')
-        c = wx.Choice(f2, -1, choices=Static.WORKUNITS)
+        c = wx.Choice(self, -1, choices=Static.WORKUNITS)
         labelTwo = wx.StaticText(p2, wx.ID_ANY, 'Enter Scopus IDs:')
-        txt = wx.TextCtrl(f2, -1, style=wx.TE_MULTILINE, size=(-1, 80))
-        # txt.SetValue('<scopus id>')
-
-        okBtn = wx.Button(p2, wx.ID_ANY, 'OK')
-        cancelBtn = wx.Button(p2, wx.ID_ANY, 'Cancel')
-        self.Bind(wx.EVT_BUTTON, self.onOK, okBtn)
-        self.Bind(wx.EVT_BUTTON, self.onCancel, cancelBtn)
+        txt = wx.TextCtrl(self, -1, style=wx.TE_MULTILINE, size=(-1, 80))
 
         topSizer = wx.BoxSizer(wx.VERTICAL)
         topSizer.Add(labelOne, 0, wx.CENTER, 5)
@@ -72,14 +74,29 @@ class Example(wx.Frame):
         topSizer.Add(labelTwo, 0, wx.CENTER, 5)
         topSizer.Add(txt, 0, wx.ALL | wx.EXPAND, 5)
 
+        okBtn = wx.Button(p2, wx.ID_ANY, 'OK')
+        cancelBtn = wx.Button(p2, wx.ID_CANCEL, 'Cancel')
+        self.Bind(wx.EVT_BUTTON, self.onOK, okBtn)
+        self.Bind(wx.EVT_BUTTON, self.on_close, cancelBtn)
+
         btnSizer = wx.BoxSizer(wx.HORIZONTAL)
         btnSizer.Add(okBtn, 0, wx.ALL, 5)
         btnSizer.Add(cancelBtn, 0, wx.ALL, 5)
         topSizer.Add(btnSizer, 0, wx.ALL | wx.CENTER, 5)
 
         p2.SetSizerAndFit(topSizer)
-        topSizer.Fit(f2)
-        f2.Show()
+        topSizer.Fit(self)
+
+    def on_close(self, evt):
+        self.MakeModal(False)
+        self.Close()
+        # evt.Skip()
+
+    def onOK(self, evt):
+        self.MakeModal(False)
+        evt.Skip()
+
+
 
 
 def main():

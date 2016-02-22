@@ -57,22 +57,21 @@ class Example(wx.Frame):
 class AddAuthorsFrame(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, wx.NewId(), "Add Scopus Author")
-        # self.Bind(wx.EVT_CLOSE, self.on_close)
         self.Centre()
         # Add a panel so it looks correct on all platforms
         p2 = wx.Panel(self, wx.ID_ANY)
 
         labelOne = wx.StaticText(p2, wx.ID_ANY, 'Select Workunit:')
-        c = wx.Choice(self, -1, choices=Static.WORKUNITS)
+        self.c = wx.Choice(self, -1, choices=Static.WORKUNITS)
         labelTwo = wx.StaticText(p2, wx.ID_ANY, 'Enter Scopus IDs:')
-        txt = wx.TextCtrl(self, -1, style=wx.TE_MULTILINE, size=(-1, 80))
+        self.txt = wx.TextCtrl(self, -1, style=wx.TE_MULTILINE, size=(-1, 80))
 
         topSizer = wx.BoxSizer(wx.VERTICAL)
         topSizer.Add(labelOne, 0, wx.CENTER, 5)
-        topSizer.Add(c, 0, wx.ALL | wx.EXPAND, 5)
+        topSizer.Add(self.c, 0, wx.ALL | wx.EXPAND, 5)
         # topSizer.Add(wx.StaticLine(p2, ), 0, wx.ALL | wx.EXPAND, 5)
         topSizer.Add(labelTwo, 0, wx.CENTER, 5)
-        topSizer.Add(txt, 0, wx.ALL | wx.EXPAND, 5)
+        topSizer.Add(self.txt, 0, wx.ALL | wx.EXPAND, 5)
 
         okBtn = wx.Button(p2, wx.ID_ANY, 'OK')
         cancelBtn = wx.Button(p2, wx.ID_CANCEL, 'Cancel')
@@ -93,9 +92,14 @@ class AddAuthorsFrame(wx.Frame):
         # evt.Skip()
 
     def onOK(self, evt):
-        self.MakeModal(False)
-        evt.Skip()
+        #### Add error checks ####
+        scopusIds = [s.strip() for s in self.txt.GetValue().splitlines()]
+        for i, val in enumerate(scopusIds):
+            newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), None)
+            print newAU.hIdx()
 
+        self.MakeModal(False)
+        self.Close()
 
 
 

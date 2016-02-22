@@ -19,3 +19,7 @@ Author ID: 56007630200
 Taylor, Kathleen E.
 Saint Mary's College of California, School of Education, Moraga, United States
 Author ID: 36986218100
+
+
+
+NEED TO CREATE dynamic configuration capabilites.

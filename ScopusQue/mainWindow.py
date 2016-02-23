@@ -11,7 +11,7 @@ pp = pprint.PrettyPrinter(indent=4)
 allData = [['56007630200', "Raymond M. Moore", "NNNN"]]
 
 
-#############  Create Table ###############
+###########  Create Table Func #############
 class AutoWidthListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
     def __init__(self, parent):
         wx.ListCtrl.__init__(self, parent, -1, style=wx.LC_REPORT)

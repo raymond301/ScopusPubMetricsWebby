@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 
 ### GLOBAL VARIABLES ###
 class Static:
@@ -25,7 +26,11 @@ class Author:
         return self.workunit_id
 
     def fullName(self):
-        print "--"
+        nameObj = self.profile['author-retrieval-response'][0]['author-profile']['preferred-name']
+        return "{} {}".format(nameObj['given-name'], nameObj['surname'])
 
     def hIdx(self):
         return self.metrics['author-retrieval-response'][0]['h-index']
+
+    def __str__(self):
+        return json.dumps(self, sort_keys=True, indent=4, separators=(',', ': '))

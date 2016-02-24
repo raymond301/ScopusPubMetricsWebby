@@ -7,8 +7,14 @@ from webby import *
 import pprint
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 pp = pprint.PrettyPrinter(indent=4)
-allData = [['56007630200', "Raymond M. Moore", "NNNN"]]
+allData = []
 
 
 ###########  Create Table Func #############
@@ -27,6 +33,8 @@ class Example(wx.Frame):
         self.InitUI()
 
     def InitUI(self):
+        logger.info('Create Main Window')
+
         #### Create Menu ####
         menubar = wx.MenuBar()
         fileMenu = wx.Menu()
@@ -63,10 +71,12 @@ class Example(wx.Frame):
         self.list.InsertColumn(1, 'Name', wx.LIST_FORMAT_CENTER, width=130)
         self.list.InsertColumn(2, 'year', wx.LIST_FORMAT_RIGHT, 90)
 
+        #########  Main Table ##########
         for i in allData:
-            index = self.list.InsertStringItem(sys.maxint, i[0])
-            self.list.SetStringItem(index, 1, i[1])
-            self.list.SetStringItem(index, 2, i[2])
+            pp.pprint(i)
+            index = self.list.InsertStringItem(sys.maxint, i.scopusId())
+            self.list.SetStringItem(index, 1, i.fullName())
+            self.list.SetStringItem(index, 2, i.group())
 
         hbox.Add(self.list, 1, wx.EXPAND)
         topSizer.Add(hbox, 0, wx.ALL | wx.EXPAND, 10)
@@ -80,12 +90,12 @@ class Example(wx.Frame):
         self.Show(True)
 
     def OnQuit(self, e):
+        f = open("myfile.txt", "wb")
+        f.write("\n".join(allData))
         self.Close()
 
     def on_button(self, evt):
         frame = AddAuthorsFrame(self)
-        print "Static.API_KEY :"
-        print Static.API_KEY
         frame.Show(True)
         frame.MakeModal(True)
 
@@ -103,6 +113,7 @@ class Example(wx.Frame):
 ############################################
 class AddAuthorsFrame(wx.Frame):
     def __init__(self, parent):
+        logger.info('Open Add Author Window')
         wx.Frame.__init__(self, parent, wx.NewId(), "Add Scopus Author")
         self.Centre()
         # Add a panel so it looks correct on all platforms
@@ -142,9 +153,14 @@ class AddAuthorsFrame(wx.Frame):
         #### Add error checks ####
         scopusIds = [s.strip() for s in self.txt.GetValue().splitlines()]
         for i, val in enumerate(scopusIds):
+            ### add check for numbers only - error back
             newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), getAuthorProfile(val))
-            print newAU.hIdx()
+            allData.append(newAU)
+            print(newAU.fullName())
+            logger.info('Author: %s', newAU)
 
+        self.GetParent().Refresh()
+        # self.parent.Refresh()
         self.MakeModal(False)
         self.Close()
 

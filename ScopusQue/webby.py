@@ -1,12 +1,13 @@
 __author__ = 'm088378'
 
-# from lxml import etree, html
 import requests
-import pprint
 from conf import *
+import json
+
+import pprint
 
 
-# import json
+# from lxml import etree, html
 #from ConfigParser import SafeConfigParser
 
 
@@ -28,6 +29,7 @@ def getAuthorMetrics(id):
 
 if __name__ == '__main__':
     ## auto get my author when run as standalone script
-    getAuthorMetrics(56007630200)
+    # getAuthorMetrics(56007630200)
     print "\n"
-    getAuthorProfile(56007630200)
+    t = getAuthorProfile(56007630200)
+    print json.dumps(t, sort_keys=True, indent=4, separators=(',', ': '))

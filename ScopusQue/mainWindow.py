@@ -2,18 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import wx, sys
-from conf import *
+from conf import Static, Author
 from webby import *
-import pprint
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
-
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG, filename='app.log', )
 logger = logging.getLogger(__name__)
 
-
-pp = pprint.PrettyPrinter(indent=4)
 allData = []
 
 

@@ -33,4 +33,11 @@ class Author:
         return self.metrics['author-retrieval-response'][0]['h-index']
 
     def __str__(self):
-        return json.dumps(self, sort_keys=True, indent=4, separators=(',', ': '))
+        str = "\nID: {}\nName: {}\nGroup: {}\nMetrics: {}\n".format(
+            self.scopus_id,
+            self.fullName(),
+            self.group(),
+            json.dumps(self.metrics, sort_keys=True, indent=4, separators=(',', ': ')))
+        return str
+
+##        return json.dumps(self, sort_keys=True, indent=4, separators=(',', ': '))

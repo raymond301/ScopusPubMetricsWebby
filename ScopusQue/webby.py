@@ -18,13 +18,19 @@ import pprint
 def getAuthorProfile(id):
     url = "{}/author?author_id={}".format(Static.ELSEVIER, id)
     resp = requests.get(url, headers={'Accept': 'application/json', 'X-ELS-APIKey': Static.API_KEY})
-    return resp.json()
+    try:
+        return resp.json()
+    except:
+        return None
 
 def getAuthorMetrics(id):
     #    url = "{}/author/author_id/{}?apiKey={}".format(Static.ELSEVIER, id, Static.API_KEY)
     url = "{}/author/author_id/{}?view=metrics".format(Static.ELSEVIER, id)
     resp = requests.get(url, headers={'Accept': 'application/json', 'X-ELS-APIKey': Static.API_KEY})
-    return resp.json()
+    try:
+        return resp.json()
+    except:
+        return {}
 
 
 if __name__ == '__main__':

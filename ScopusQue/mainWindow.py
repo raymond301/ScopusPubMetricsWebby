@@ -7,10 +7,11 @@ from webby import *
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 import logging
 
-logging.basicConfig(level=logging.DEBUG, filename='app.log', )
+logging.basicConfig(level=logging.DEBUG, filename='sq_app.log', )
 logger = logging.getLogger(__name__)
 
-allData = []
+tmp = Author('44444', 'Here', {}, {})
+allData = [tmp]
 
 
 ###########  Create Table Func #############
@@ -30,7 +31,6 @@ class Example(wx.Frame):
 
     def InitUI(self):
         logger.info('Create Main Window')
-
         #### Create Menu ####
         menubar = wx.MenuBar()
         fileMenu = wx.Menu()
@@ -51,6 +51,14 @@ class Example(wx.Frame):
         menubar.Append(fileMenu, '&File')
         self.SetMenuBar(menubar)
 
+        self.makeMainTableList()
+
+        #### Set Window Attributes ####
+        self.SetSize((750, 600))  ## (w,h)
+        self.SetTitle(Static.APP_NAME)
+        self.Show(True)
+
+    def makeMainTableList(self):
         #### Create Panel ####
         pnl = wx.Panel(self)
         topSizer = wx.BoxSizer(wx.VERTICAL)
@@ -65,11 +73,10 @@ class Example(wx.Frame):
         self.list = AutoWidthListCtrl(pnl)
         self.list.InsertColumn(0, 'Scopus ID', width=100)
         self.list.InsertColumn(1, 'Name', wx.LIST_FORMAT_CENTER, width=130)
-        self.list.InsertColumn(2, 'year', wx.LIST_FORMAT_RIGHT, 90)
+        self.list.InsertColumn(2, 'Work Unit', wx.LIST_FORMAT_RIGHT, 90)
 
         #########  Main Table ##########
         for i in allData:
-            pp.pprint(i)
             index = self.list.InsertStringItem(sys.maxint, i.scopusId())
             self.list.SetStringItem(index, 1, i.fullName())
             self.list.SetStringItem(index, 2, i.group())
@@ -78,16 +85,9 @@ class Example(wx.Frame):
         topSizer.Add(hbox, 0, wx.ALL | wx.EXPAND, 10)
         pnl.SetSizerAndFit(topSizer)
 
-        # self.button.Bind(wx.EVT_BUTTON, self.on_button)
-
-        #### Set Window Attributes ####
-        self.SetSize((750, 600))  ## (w,h)
-        self.SetTitle(Static.APP_NAME)
-        self.Show(True)
 
     def OnQuit(self, e):
-        f = open("myfile.txt", "wb")
-        f.write("\n".join(allData))
+        logger.info(','.join(allData))
         self.Close()
 
     def on_button(self, evt):
@@ -152,10 +152,11 @@ class AddAuthorsFrame(wx.Frame):
             ### add check for numbers only - error back
             newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), getAuthorProfile(val))
             allData.append(newAU)
-            print(newAU.fullName())
             logger.info('Author: %s', newAU)
 
-        self.GetParent().Refresh()
+        # self.GetParent().Refresh()
+        # self.makeMainTableList()
+        logger.debug(self.GetParent())
         # self.parent.Refresh()
         self.MakeModal(False)
         self.Close()

@@ -42,7 +42,6 @@ import matplotlib
 #
 #
 
-
 import numpy as np
 import wx
 from wx.lib.plot import PlotCanvas, PlotGraphics, PolyLine, PolyMarker

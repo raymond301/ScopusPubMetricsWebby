@@ -31,6 +31,9 @@ class Example(wx.Frame):
 
     def InitUI(self):
         logger.info('Create Main Window')
+        #### Set Window Attributes ####
+        self.SetSize((750, 600))  ## (w,h)
+        self.SetTitle(Static.APP_NAME)
         #### Create Menu ####
         menubar = wx.MenuBar()
         fileMenu = wx.Menu()
@@ -53,9 +56,6 @@ class Example(wx.Frame):
 
         self.makeMainTableList()
 
-        #### Set Window Attributes ####
-        self.SetSize((750, 600))  ## (w,h)
-        self.SetTitle(Static.APP_NAME)
         self.Show(True)
 
     def makeMainTableList(self):
@@ -150,13 +150,15 @@ class AddAuthorsFrame(wx.Frame):
         scopusIds = [s.strip() for s in self.txt.GetValue().splitlines()]
         for i, val in enumerate(scopusIds):
             ### add check for numbers only - error back
-            newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), getAuthorProfile(val))
+            # newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), getAuthorProfile(val))
+            newAU = Author('76676544', 'Here 2', {}, {})
             allData.append(newAU)
-            logger.info('Author: %s', newAU)
+            #logger.info('Author: %s', newAU)
 
         # self.GetParent().Refresh()
         # self.makeMainTableList()
-        logger.debug(self.GetParent())
+        logger.debug(self.GetParent().GetTitle())
+        self.GetParent().makeMainTableList()
         # self.parent.Refresh()
         self.MakeModal(False)
         self.Close()

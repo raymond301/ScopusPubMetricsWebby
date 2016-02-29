@@ -79,12 +79,20 @@ class Example(wx.Frame):
         self.list.InsertColumn(7, '# Affiliations', wx.LIST_FORMAT_CENTER, 90)
         self.list.InsertColumn(8, 'Work Unit', wx.LIST_FORMAT_RIGHT, 90)
 
-
         ## Use this function to dymanically keep adding to Table from Global Array
         self.updateTable()
+        hbox.Add(self.list, 1, wx.EXPAND | wx.GROW)
+        topSizer.Add(hbox, 0, wx.ALL | wx.EXPAND | wx.GROW, 10)
 
-        hbox.Add(self.list, 1, wx.EXPAND)
-        topSizer.Add(hbox, 0, wx.ALL | wx.EXPAND, 10)
+        btnSizer2 = wx.BoxSizer(wx.HORIZONTAL)
+        okBtn = wx.Button(self.pnlTableList, wx.ID_ANY, 'OK')
+        cancelBtn = wx.Button(self.pnlTableList, wx.ID_CANCEL, 'Cancel')
+        self.Bind(wx.EVT_BUTTON, self.OnQuit, okBtn)
+        self.Bind(wx.EVT_BUTTON, self.OnQuit, cancelBtn)
+        btnSizer2.Add(okBtn, 0, wx.ALL, 20)
+        btnSizer2.Add(cancelBtn, 0, wx.ALL, 20)
+        topSizer.Add(btnSizer2, 0, wx.ALL | wx.CENTER, 5)
+
         self.pnlTableList.SetSizerAndFit(topSizer)
         self.Show(True)
 
@@ -160,7 +168,6 @@ class AddAuthorsFrame(wx.Frame):
     def on_close(self, evt):
         self.MakeModal(False)
         self.Close()
-        # evt.Skip()
 
     def onOK(self, evt):
         #### Add error checks ####
@@ -168,13 +175,11 @@ class AddAuthorsFrame(wx.Frame):
         for i, val in enumerate(scopusIds):
             ### add check for numbers only - error back
             # newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), getAuthorProfile(val))
-            newAU = Author('76676544333', 'Here 2', {}, {})
+            newAU = Author('76676544333', 'Here 2', DUMMYMETRIC, DUMMYPROFILE)
             allData.append(newAU)
             #logger.info('Author: %s', newAU)
 
-        # self.GetParent().Refresh()
-        # self.makeMainTableList()
-        logger.debug(self.GetParent().GetTitle())
+        #        logger.debug(self.GetParent().GetTitle())
         self.GetParent().updateTable()
         # self.parent.Refresh()
         self.MakeModal(False)

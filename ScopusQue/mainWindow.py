@@ -5,6 +5,9 @@ import wx, sys
 from conf import Static, Author
 from webby import *
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
+from wx.lib.agw import ultimatelistctrl as ULC
+import wx.lib.agw.hyperlink as hylk
+
 import logging
 
 logging.basicConfig(level=logging.DEBUG, filename='sq_app.log', )
@@ -20,9 +23,12 @@ allData = [tmp]
 
 
 ###########  Create Table Func #############
-class AutoWidthListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
+class AutoWidthListCtrl(ULC.UltimateListCtrl, ListCtrlAutoWidthMixin):
     def __init__(self, parent):
-        wx.ListCtrl.__init__(self, parent, -1, style=wx.LC_REPORT)
+        # wx.ListCtrl.__init__(self, parent, -1, style=wx.LC_REPORT)
+        # ULC.UltimateListCtrl(self, agwStyle = wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES)
+        ULC.UltimateListCtrl.__init__(self, parent, size=(-1, 420),
+                                      agwStyle=wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
         ListCtrlAutoWidthMixin.__init__(self)
 
 
@@ -37,7 +43,7 @@ class Example(wx.Frame):
     def InitUI(self):
         logger.info('Create Main Window')
         #### Set Window Attributes ####
-        self.SetSize((950, 600))  ## (w,h)
+        self.SetSize((960, 600))  ## (w,h)
         self.SetTitle(Static.APP_NAME)
         #### Create Menu ####
         menubar = wx.MenuBar()
@@ -69,29 +75,30 @@ class Example(wx.Frame):
         topSizer.Add(btnSizer, 0, wx.ALL | wx.ALIGN_RIGHT, 10)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.list = AutoWidthListCtrl(self.pnlTableList)
-        self.list.InsertColumn(0, 'Scopus ID', width=100)
-        self.list.InsertColumn(1, 'Name', wx.LIST_FORMAT_CENTER, width=130)
-        self.list.InsertColumn(2, 'H-Index', wx.LIST_FORMAT_CENTER, 90)
-        self.list.InsertColumn(3, 'Total Articles', wx.LIST_FORMAT_CENTER, 90)
-        self.list.InsertColumn(4, '# Co-authors', wx.LIST_FORMAT_CENTER, 90)
-        self.list.InsertColumn(5, '# Citations', wx.LIST_FORMAT_CENTER, 90)
-        self.list.InsertColumn(6, '# Cited By', wx.LIST_FORMAT_CENTER, 90)
-        self.list.InsertColumn(7, '# Affiliations', wx.LIST_FORMAT_CENTER, 90)
-        self.list.InsertColumn(8, 'Work Unit', wx.LIST_FORMAT_RIGHT, 90)
+        self.list.InsertColumn(0, 'Scopus ID', wx.LIST_FORMAT_CENTER, width=115)
+        self.list.InsertColumn(1, 'Name', wx.LIST_FORMAT_CENTER, width=170)
+        self.list.InsertColumn(2, 'H-Index', wx.LIST_FORMAT_CENTER, 70)
+        self.list.InsertColumn(3, 'Total Articles', wx.LIST_FORMAT_CENTER, 70)
+        self.list.InsertColumn(4, '# Co-authors', wx.LIST_FORMAT_CENTER, 70)
+        self.list.InsertColumn(5, '# Citations', wx.LIST_FORMAT_CENTER, 70)
+        self.list.InsertColumn(6, '# Cited By', wx.LIST_FORMAT_CENTER, 70)
+        self.list.InsertColumn(7, '# Affiliations', wx.LIST_FORMAT_CENTER, 80)
+        self.list.InsertColumn(8, 'View', wx.LIST_FORMAT_CENTER, 70)
+        self.list.InsertColumn(9, 'Work Unit', wx.LIST_FORMAT_CENTER, 90)
 
         ## Use this function to dymanically keep adding to Table from Global Array
         self.updateTable()
-        hbox.Add(self.list, 1, wx.EXPAND | wx.GROW)
-        topSizer.Add(hbox, 0, wx.ALL | wx.EXPAND | wx.GROW, 10)
+        hbox.Add(self.list, 1, wx.EXPAND)
+        topSizer.Add(hbox, 0, wx.BOTTOM | wx.EXPAND | wx.GROW, 20)
 
         btnSizer2 = wx.BoxSizer(wx.HORIZONTAL)
         okBtn = wx.Button(self.pnlTableList, wx.ID_ANY, 'OK')
         cancelBtn = wx.Button(self.pnlTableList, wx.ID_CANCEL, 'Cancel')
         self.Bind(wx.EVT_BUTTON, self.OnQuit, okBtn)
         self.Bind(wx.EVT_BUTTON, self.OnQuit, cancelBtn)
-        btnSizer2.Add(okBtn, 0, wx.ALL, 20)
-        btnSizer2.Add(cancelBtn, 0, wx.ALL, 20)
-        topSizer.Add(btnSizer2, 0, wx.ALL | wx.CENTER, 5)
+        btnSizer2.Add(okBtn, 0, wx.ALL, 10)
+        btnSizer2.Add(cancelBtn, 0, wx.ALL, 10)
+        topSizer.Add(btnSizer2, 0, wx.ALL | wx.CENTER, 15)
 
         self.pnlTableList.SetSizerAndFit(topSizer)
         self.Show(True)
@@ -101,6 +108,8 @@ class Example(wx.Frame):
         ## Scopus ID | Name | Work Unit
         self.list.DeleteAllItems()
         for i in allData:
+            # hyper1 = hylk.HyperLinkCtrl(self.list, -1, i.scopusId(), URL="http://www.wxpython.org/")
+            #info = ULC.UltimateListItem()
             index = self.list.InsertStringItem(sys.maxint, i.scopusId())
             self.list.SetStringItem(index, 1, i.fullName())
             self.list.SetStringItem(index, 2, i.hIdx())
@@ -109,7 +118,10 @@ class Example(wx.Frame):
             self.list.SetStringItem(index, 5, i.citationNx())
             self.list.SetStringItem(index, 6, i.citedByNx())
             self.list.SetStringItem(index, 7, i.affiliationNx())
-            self.list.SetStringItem(index, 8, i.group())
+            b2 = wx.Button(self.list, wx.ID_ANY, label="Report")
+            self.Bind(wx.EVT_BUTTON, self.open_personal_report, b2)
+            self.list.SetItemWindow(index, col=8, wnd=b2, expand=True)
+            self.list.SetStringItem(index, 9, i.group())
 
     def OnQuit(self, e):
         logger.info(','.join(allData))
@@ -127,6 +139,11 @@ class Example(wx.Frame):
             # print('You entered: %s\n' % dlg.GetValue())
             Static.API_KEY = dlg.GetValue()
         dlg.Destroy()
+
+    def open_personal_report(self, e):
+        logger.debug(self)
+        logger.debug(e)
+        #logger.debug("Author Index: {}".format(idx))
 
 
 ############################################

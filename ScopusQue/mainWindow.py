@@ -7,6 +7,7 @@ from webby import *
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.agw import ultimatelistctrl as ULC
 import wx.lib.agw.hyperlink as hylk
+from random import randint
 
 import logging
 
@@ -18,7 +19,7 @@ DUMMYMETRIC = json.loads(
 DUMMYPROFILE = json.loads(
     '{"author-retrieval-response":[{"@_fa":"true","@status":"found","affiliation-current":{"@href":"http://api.elsevier.com/content/affiliation/affiliation_id/103323174","@id":"103323174"},"author-profile":{"affiliation-current":{"affiliation":{"@affiliation-id":"103323174","@parent":"60005558","ip-doc":{"@id":"103323174","@relationship":"author","@type":"dept","address":{"@country":"usa","city":"Rochester","country":"UnitedStates","postal-code":"55905","state":"MN"},"afdispname":"MayoClinic,DepartmentofHealthSciencesResearch","org-URL":"http://www.mayoclinic.org/","org-domain":"mayoclinic.org","parent-preferred-name":"MayoClinic","preferred-name":"DepartmentofHealthSciencesResearch","sort-name":"DepartmentofHealthSciencesResearch"}}},"affiliation-history":{"affiliation":[{"@affiliation-id":"103323174","@parent":"60005558","ip-doc":{"@id":"103323174","@relationship":"author","@type":"dept","address":{"@country":"usa","city":"Rochester","country":"UnitedStates","postal-code":"55905","state":"MN"},"afdispname":"MayoClinic,DepartmentofHealthSciencesResearch","org-URL":"http://www.mayoclinic.org/","org-domain":"mayoclinic.org","parent-preferred-name":"MayoClinic","preferred-name":"DepartmentofHealthSciencesResearch","sort-name":"DepartmentofHealthSciencesResearch"}},{"@affiliation-id":"103323932","@parent":"60005558","ip-doc":{"@id":"103323932","@relationship":"author","@type":"dept","address":{"@country":"usa","city":"Rochester","country":"UnitedStates","postal-code":"55905","state":"MN"},"afdispname":"MayoClinic,DivisionofBiomedicalStatisticsandInformatics","org-URL":"http://www.mayoclinic.org/","org-domain":"mayoclinic.org","parent-preferred-name":"MayoClinic","preferred-name":"DivisionofBiomedicalStatisticsandInformatics","sort-name":"DivisionofBiomedicalStatisticsandInformatics"}},{"@affiliation-id":"103246320","@parent":"60003892","ip-doc":{"@id":"103246320","@relationship":"author","@type":"dept","address":{"@country":"usa","address-part":"UniversityDriveandMillAvenue","city":"Tempe","country":"UnitedStates","state":"AZ"},"afdispname":"ArizonaStateUniversity,DepartmentofBiomedicalInformatics","org-URL":"http://www.asu.edu/","org-domain":"asu.edu","parent-preferred-name":"ArizonaStateUniversity","preferred-name":"DepartmentofBiomedicalInformatics","sort-name":"DepartmentofBiomedicalInformatics"}}]},"classificationgroup":{"classifications":{"@type":"ASJC","classification":[{"$":"1303","@frequency":"3"},{"$":"1703","@frequency":"1"},{"$":"2204","@frequency":"1"},{"$":"2713","@frequency":"1"},{"$":"2730","@frequency":"1"},{"$":"2605","@frequency":"1"},{"$":"2700","@frequency":"4"},{"$":"2613","@frequency":"1"},{"$":"1100","@frequency":"3"},{"$":"2800","@frequency":"1"},{"$":"1315","@frequency":"2"},{"$":"2216","@frequency":"1"},{"$":"2718","@frequency":"1"},{"$":"1312","@frequency":"3"},{"$":"1300","@frequency":"3"},{"$":"1706","@frequency":"3"},{"$":"2604","@frequency":"2"}]}},"date-created":{"@day":"07","@month":"02","@year":"2014"},"journal-history":{"@type":"author","journal":[{"@type":"j","issn":"10559965","sourcetitle":"CancerEpidemiologyBiomarkersandPrevention","sourcetitle-abbrev":"CancerEpidemiol.BiomarkersPrev."},{"@type":"j","issn":"14602059","sourcetitle":"Bioinformatics","sourcetitle-abbrev":"Bioinformatics"},{"@type":"j","issn":"19326203","sourcetitle":"PLoSONE","sourcetitle-abbrev":"PLoSONE"},{"@type":"j","issn":"14712105","sourcetitle":"BMCbioinformatics","sourcetitle-abbrev":"BMCBioinformatics"},{"@type":"j","issn":"21678359","sourcetitle":"PeerJ","sourcetitle-abbrev":"PeerJ"},{"@type":"j","issn":"14712105","sourcetitle":"BMCBioinformatics","sourcetitle-abbrev":"BMCBioinform."},{"@type":"p","sourcetitle":"BIOINFORMATICS2015-6thInternationalConferenceonBioinformaticsModels,MethodsandAlgorithms,Proceedings;Partof8thInternationalJointConferenceonBiomedicalEngineeringSystemsandTechnologies,BIOSTEC2015","sourcetitle-abbrev":"BIOINFORMATICS-Int.Conf.Bioinform.Model.,MethodsAlgorithms,Proc.;PartInt.Jt.Conf.Biomed.Eng.Syst.Technol.,BIOSTEC"},{"@type":"j","issn":"13674811","sourcetitle":"Bioinformatics(Oxford,England)","sourcetitle-abbrev":"Bioinformatics"}]},"name-variant":{"given-name":"Raymond","indexed-name":"MooreR.","initials":"R.","surname":"Moore"},"preferred-name":{"given-name":"RaymondM.","indexed-name":"MooreR.","initials":"R.M.","surname":"Moore"},"publication-range":{"@end":"2016","@start":"2013"},"status":"update"},"coredata":{"citation-count":"13","cited-by-count":"13","dc:identifier":"AUTHOR_ID:56007630200","document-count":"5","eid":"9-s2.0-56007630200","link":[{"@_fa":"true","@href":"http://api.elsevier.com/content/search/scopus?query=refauid%2856007630200%29","@rel":"scopus-citedby"},{"@_fa":"true","@href":"http://www.scopus.com/authid/detail.url?partnerID=HzOxMe3b&authorId=56007630200&origin=inward","@rel":"scopus-author"},{"@_fa":"true","@href":"http://api.elsevier.com/content/author/author_id/56007630200","@rel":"self"},{"@_fa":"true","@href":"http://api.elsevier.com/content/search/scopus?query=au-id%2856007630200%29","@rel":"search"}],"prism:url":"http://api.elsevier.com/content/author/author_id/56007630200"},"subject-areas":{"subject-area":[{"$":"Biochemistry","@_fa":"true","@abbrev":"BIOC","@code":"1303"},{"$":"ComputationalTheoryandMathematics","@_fa":"true","@abbrev":"COMP","@code":"1703"},{"$":"BiomedicalEngineering","@_fa":"true","@abbrev":"ENGI","@code":"2204"},{"$":"Epidemiology","@_fa":"true","@abbrev":"MEDI","@code":"2713"},{"$":"Oncology","@_fa":"true","@abbrev":"MEDI","@code":"2730"},{"$":"ComputationalMathematics","@_fa":"true","@abbrev":"MATH","@code":"2605"},{"$":"Medicine(all)","@_fa":"true","@abbrev":"MEDI","@code":"2700"},{"$":"StatisticsandProbability","@_fa":"true","@abbrev":"MATH","@code":"2613"},{"$":"AgriculturalandBiologicalSciences(all)","@_fa":"true","@abbrev":"AGRI","@code":"1100"},{"$":"Neuroscience(all)","@_fa":"true","@abbrev":"NEUR","@code":"2800"},{"$":"StructuralBiology","@_fa":"true","@abbrev":"BIOC","@code":"1315"},{"$":"Architecture","@_fa":"true","@abbrev":"ENGI","@code":"2216"},{"$":"HealthInformatics","@_fa":"true","@abbrev":"MEDI","@code":"2718"},{"$":"MolecularBiology","@_fa":"true","@abbrev":"BIOC","@code":"1312"},{"$":"Biochemistry,GeneticsandMolecularBiology(all)","@_fa":"true","@abbrev":"BIOC","@code":"1300"},{"$":"ComputerScienceApplications","@_fa":"true","@abbrev":"COMP","@code":"1706"},{"$":"AppliedMathematics","@_fa":"true","@abbrev":"MATH","@code":"2604"}]}}]}')
 
-tmp = Author('44444444444', 'No-Where', DUMMYMETRIC, DUMMYPROFILE)
+tmp = Author('44444444444', 'BSI IS I', DUMMYMETRIC, DUMMYPROFILE)
 allData = [tmp]
 
 
@@ -92,12 +93,15 @@ class Example(wx.Frame):
         topSizer.Add(hbox, 0, wx.BOTTOM | wx.EXPAND | wx.GROW, 20)
 
         btnSizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        okBtn = wx.Button(self.pnlTableList, wx.ID_ANY, 'OK')
-        cancelBtn = wx.Button(self.pnlTableList, wx.ID_CANCEL, 'Cancel')
-        self.Bind(wx.EVT_BUTTON, self.OnQuit, okBtn)
-        self.Bind(wx.EVT_BUTTON, self.OnQuit, cancelBtn)
-        btnSizer2.Add(okBtn, 0, wx.ALL, 10)
-        btnSizer2.Add(cancelBtn, 0, wx.ALL, 10)
+        allBtn = wx.Button(self.pnlTableList, wx.ID_ANY, 'Graphs: Whole Collection')
+        wuBtn = wx.Button(self.pnlTableList, wx.ID_ANY, 'Graphs: By Work Unit')
+        fetchBtn = wx.Button(self.pnlTableList, wx.ID_CANCEL, 'Re-Fetch Data')
+        self.Bind(wx.EVT_BUTTON, self.all_collection_graph, allBtn)
+        self.Bind(wx.EVT_BUTTON, self.work_group_graph, wuBtn)
+        self.Bind(wx.EVT_BUTTON, self.refetch_data, fetchBtn)
+        btnSizer2.Add(allBtn, 0, wx.ALL, 10)
+        btnSizer2.Add(wuBtn, 0, wx.ALL, 10)
+        btnSizer2.Add(fetchBtn, 0, wx.ALL, 10)
         topSizer.Add(btnSizer2, 0, wx.ALL | wx.CENTER, 15)
 
         self.pnlTableList.SetSizerAndFit(topSizer)
@@ -105,7 +109,6 @@ class Example(wx.Frame):
 
     def updateTable(self):
         #########  Main Table ##########
-        ## Scopus ID | Name | Work Unit
         self.list.DeleteAllItems()
         for i in allData:
             # hyper1 = hylk.HyperLinkCtrl(self.list, -1, i.scopusId(), URL="http://www.wxpython.org/")
@@ -144,6 +147,20 @@ class Example(wx.Frame):
         logger.debug(self)
         logger.debug(e)
         #logger.debug("Author Index: {}".format(idx))
+
+    def refetch_data(self, e):
+        ### add dialog with progress bar???
+        logger.debug(self)
+        logger.debug(e)
+
+    def all_collection_graph(self, e):
+        logger.debug(self)
+        logger.debug(e)
+
+    def work_group_graph(self, e):
+        logger.debug(self)
+        logger.debug(e)
+
 
 
 ############################################
@@ -192,13 +209,9 @@ class AddAuthorsFrame(wx.Frame):
         for i, val in enumerate(scopusIds):
             ### add check for numbers only - error back
             # newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), getAuthorProfile(val))
-            newAU = Author('76676544333', 'Here 2', DUMMYMETRIC, DUMMYPROFILE)
+            newAU = Author('76676544333', Static.WORKUNITS[randint(0, 5)], DUMMYMETRIC, DUMMYPROFILE)
             allData.append(newAU)
-            #logger.info('Author: %s', newAU)
-
-        #        logger.debug(self.GetParent().GetTitle())
         self.GetParent().updateTable()
-        # self.parent.Refresh()
         self.MakeModal(False)
         self.Close()
 

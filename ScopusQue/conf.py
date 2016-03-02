@@ -6,12 +6,18 @@ class Static:
     version = '0.1'
     APP_NAME = 'Scopus Que Assistant'
     WORKUNITS = ["Faculty RA", "BSI IS I", "BSI IS II", "BSI IS Lead", "Biostats SPA", "Biostats MS"]
-
     ## This API is registered to:  http://bioinformaticstools.mayo.edu/
     API_KEY = 'cd09a4ac6f3441da7d13d2dc37f7b9a3'
     #  API_KEY = '6492f9c867ddf3e84baa10b5971e3e3d'
     ELSEVIER = 'http://api.elsevier.com:80/content'
 
+
+def raw2json(arr):
+    simplifiedArr = []
+    for au in arr:
+        tmpObj = {'id': au.scopus_id, 'group': au.workunit_id, 'metrics': au.metrics, 'profile': au.profile}
+        simplifiedArr.append(json.dumps(tmpObj, default=lambda o: o.__dict__))
+    return simplifiedArr
 
 class Author:
     def __init__(self, id, w, m, p):

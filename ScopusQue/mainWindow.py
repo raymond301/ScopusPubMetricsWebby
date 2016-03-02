@@ -28,7 +28,7 @@ class AutoWidthListCtrl(ULC.UltimateListCtrl, ListCtrlAutoWidthMixin):
     def __init__(self, parent):
         # wx.ListCtrl.__init__(self, parent, -1, style=wx.LC_REPORT)
         # ULC.UltimateListCtrl(self, agwStyle = wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES)
-        ULC.UltimateListCtrl.__init__(self, parent, size=(-1, 440),
+        ULC.UltimateListCtrl.__init__(self, parent, size=(-1, 430),
                                       agwStyle=wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
         ListCtrlAutoWidthMixin.__init__(self)
 
@@ -40,7 +40,7 @@ class PrimaryWin(wx.Frame):
     def __init__(self, *args, **kw):
         super(PrimaryWin, self).__init__(*args, **kw)
         # --- initialize other settings
-        self.dirName = os.path.expanduser("~")
+        self.dirName = os.path.expanduser("~/Desktop")
         self.fileName = ""
         self.InitUI()
 
@@ -70,6 +70,11 @@ class PrimaryWin(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnQuit, qmi)
         menubar.Append(fileMenu, '&File')
         self.SetMenuBar(menubar)
+
+        # --- add a statusBar (with date/time panel)
+        sb = self.CreateStatusBar(3)
+        sb.SetStatusWidths([-1, 65, 150])
+        sb.PushStatusText("Ready", SB_INFO)
 
         #### Create Panel ####
         self.pnlTableList = wx.Panel(self)
@@ -154,12 +159,12 @@ class PrimaryWin(wx.Frame):
             try:
                 ### check to ensure extension is .json
                 self.fileName = os.path.splitext(self.fileName)[0] + '.json'
-                with open(os.path.join(self.dirName, self.fileName), 'w') as outfile:
-                    json.dump(allData, outfile)
-                self.PushStatusText("Saved Data file! ", SB_INFO)
+                f = file(os.path.join(self.dirName, self.fileName), 'w')
+                f.write(json.dumps(raw2json(allData)))
+                self.PushStatusText("Saved " + self.fileName + " file! ", SB_INFO)
                 return True
             except:
-                self.PushStatusText("Error in saving file.", SB_INFO)
+                self.PushStatusText("FAILED TO SAVE FILE!", SB_INFO)
                 return False
         else:
             ### - If no name yet, then use the OnFileSaveAs to get name/directory

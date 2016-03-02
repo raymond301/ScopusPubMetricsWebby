@@ -22,4 +22,8 @@ Author ID: 36986218100
 
 
 
-NEED TO CREATE dynamic configuration capabilites.
+
+add ability to write out tab file of metric summary
+
+
+NEEDS, NEEDS MORE TESTING!!!!

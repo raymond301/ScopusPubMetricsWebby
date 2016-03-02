@@ -3,6 +3,7 @@
 
 import wx, sys, os
 from conf import Static, Author
+from tmpGraph import *
 from webby import *
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 from wx.lib.agw import ultimatelistctrl as ULC
@@ -10,7 +11,6 @@ import wx.lib.agw.hyperlink as hylk
 from random import randint
 
 import logging
-
 logging.basicConfig(level=logging.DEBUG, filename='sq_app.log', )
 logger = logging.getLogger(__name__)
 
@@ -235,8 +235,12 @@ class PrimaryWin(wx.Frame):
         logger.debug(e)
 
     def work_group_graph(self, e):
-        logger.debug(self)
-        logger.debug(e)
+        frame = BarsFrame()
+        frame.Show(True)
+        frame.MakeModal(True)
+
+        # logger.debug(self)
+        # logger.debug(e)
 
 
 
@@ -285,7 +289,7 @@ class AddAuthorsFrame(wx.Frame):
         scopusIds = [s.strip() for s in self.txt.GetValue().splitlines()]
         for i, val in enumerate(scopusIds):
             ### add check for numbers only - error back
-            # newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), getAuthorProfile(val))
+            #newAU = Author(val, self.c.GetString(self.c.GetSelection()), getAuthorMetrics(val), getAuthorProfile(val))
             newAU = Author('76676544333', Static.WORKUNITS[randint(0, 5)], DUMMYMETRIC, DUMMYPROFILE)
             allData.append(newAU)
         self.GetParent().updateTable()

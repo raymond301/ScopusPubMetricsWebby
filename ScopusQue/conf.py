@@ -19,6 +19,7 @@ def raw2json(arr):
         simplifiedArr.append(json.dumps(tmpObj, default=lambda o: o.__dict__))
     return simplifiedArr
 
+
 class Author:
     def __init__(self, id, w, m, p):
         self.scopus_id = id
@@ -80,7 +81,6 @@ class Author:
             return len(self.profile['author-retrieval-response'][0]['affiliation-history']['affiliation'])
         except:
             return '0'
-
 
 
     def __str__(self):

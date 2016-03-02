@@ -1,7 +1,7 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-import wx, sys
+import wx, sys, os
 from conf import Static, Author
 from webby import *
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
@@ -21,14 +21,14 @@ DUMMYPROFILE = json.loads(
 
 tmp = Author('44444444444', 'BSI IS I', DUMMYMETRIC, DUMMYPROFILE)
 allData = [tmp]
-
+SB_INFO = 0
 
 ###########  Create Table Func #############
 class AutoWidthListCtrl(ULC.UltimateListCtrl, ListCtrlAutoWidthMixin):
     def __init__(self, parent):
         # wx.ListCtrl.__init__(self, parent, -1, style=wx.LC_REPORT)
         # ULC.UltimateListCtrl(self, agwStyle = wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES)
-        ULC.UltimateListCtrl.__init__(self, parent, size=(-1, 420),
+        ULC.UltimateListCtrl.__init__(self, parent, size=(-1, 440),
                                       agwStyle=wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT)
         ListCtrlAutoWidthMixin.__init__(self)
 
@@ -36,9 +36,12 @@ class AutoWidthListCtrl(ULC.UltimateListCtrl, ListCtrlAutoWidthMixin):
 ############################################
 ###       Main Window - has Table        ###
 ############################################
-class Example(wx.Frame):
+class PrimaryWin(wx.Frame):
     def __init__(self, *args, **kw):
-        super(Example, self).__init__(*args, **kw)
+        super(PrimaryWin, self).__init__(*args, **kw)
+        # --- initialize other settings
+        self.dirName = os.path.expanduser("~")
+        self.fileName = ""
         self.InitUI()
 
     def InitUI(self):
@@ -51,9 +54,11 @@ class Example(wx.Frame):
         fileMenu = wx.Menu()
         op = wx.MenuItem(fileMenu, wx.ID_OPEN, '&Open Session')
         op.SetBitmap(wx.Bitmap('Import.png'))
+        wx.EVT_MENU(self, wx.ID_OPEN, self.OnFileOpen)
         fileMenu.AppendItem(op)
         sv = wx.MenuItem(fileMenu, wx.ID_SAVE, '&Save Session')
         sv.SetBitmap(wx.Bitmap('Export.png'))
+        wx.EVT_MENU(self, wx.ID_SAVE, self.OnFileSave)
         fileMenu.AppendItem(sv)
         fileMenu.AppendSeparator()
 
@@ -107,6 +112,76 @@ class Example(wx.Frame):
         self.pnlTableList.SetSizerAndFit(topSizer)
         self.Show(True)
 
+    # ---------------Menu Item------------------#
+    def OnQuit(self, e):
+        logger.info(','.join(allData))
+        self.Close()
+
+    # ---------------Menu Item------------------#
+    def OnFileOpen(self, e):
+        """ File|Open event - Open dialog box. """
+        dlg = wx.FileDialog(self, "Open", self.dirName, self.fileName,
+                            "Data Files (*.json)|*.json|All Files|*.*", wx.OPEN)
+        if (dlg.ShowModal() == wx.ID_OK):
+            self.fileName = dlg.GetFilename()
+            self.dirName = dlg.GetDirectory()
+
+            ### - this will read in Unicode files (since I'm using Unicode wxPython
+            # if self.rtb.LoadFile(os.path.join(self.dirName, self.fileName)):
+            #    self.SetStatusText("Opened file: " + str(self.rtb.GetLastPosition()) +
+            #                       " characters.", SB_INFO)
+            #    self.ShowPos()
+            # else:
+            #    self.SetStatusText("Error in opening file.", SB_INFO)
+
+            ### - but we want just plain ASCII files, so:
+            try:
+                f = file(os.path.join(self.dirName, self.fileName), 'r')
+                self.rtb.SetValue(f.read())
+                self.SetTitle(Static.APP_NAME + " - [" + self.fileName + "]")
+                self.SetStatusText("Opened file: " + str(self.rtb.GetLastPosition()) +
+                                   " characters.", SB_INFO)
+                self.ShowPos()
+                f.close()
+            except:
+                self.PushStatusText("Error in opening file.", SB_INFO)
+        dlg.Destroy()
+
+    # ---------------Menu Item------------------#
+    def OnFileSave(self, e):
+        """ File|Save event - Just Save it if it's got a name. """
+        if (self.fileName != "") and (self.dirName != ""):
+            try:
+                ### check to ensure extension is .json
+                self.fileName = os.path.splitext(self.fileName)[0] + '.json'
+                with open(os.path.join(self.dirName, self.fileName), 'w') as outfile:
+                    json.dump(allData, outfile)
+                self.PushStatusText("Saved Data file! ", SB_INFO)
+                return True
+            except:
+                self.PushStatusText("Error in saving file.", SB_INFO)
+                return False
+        else:
+            ### - If no name yet, then use the OnFileSaveAs to get name/directory
+            return self.OnFileSaveAs(e)
+
+    # ---------------Menu Item - Support------------------#
+    def OnFileSaveAs(self, e):
+        """ File|SaveAs event - Prompt for File Name. """
+        ret = False
+        dlg = wx.FileDialog(self, "Save As", self.dirName, self.fileName,
+                            "Data Files (*.json)|*.json|All Files|*.*", wx.SAVE)
+        if (dlg.ShowModal() == wx.ID_OK):
+            self.fileName = dlg.GetFilename()
+            self.dirName = dlg.GetDirectory()
+            ### - Use the OnFileSave to save the file
+            if self.OnFileSave(e):
+                self.SetTitle(Static.APP_NAME + " - [" + self.fileName + "]")
+                ret = True
+        dlg.Destroy()
+        return ret
+
+    # ---------------Main Window Table------------------#
     def updateTable(self):
         #########  Main Table ##########
         self.list.DeleteAllItems()
@@ -126,9 +201,6 @@ class Example(wx.Frame):
             self.list.SetItemWindow(index, col=8, wnd=b2, expand=True)
             self.list.SetStringItem(index, 9, i.group())
 
-    def OnQuit(self, e):
-        logger.info(','.join(allData))
-        self.Close()
 
     def on_button(self, evt):
         frame = AddAuthorsFrame(self)
@@ -223,7 +295,7 @@ def main():
 
     ### start UI ###
     ex = wx.App(redirect=False)
-    Example(None)
+    PrimaryWin(None)
     ex.MainLoop()
 
 if __name__ == '__main__':
